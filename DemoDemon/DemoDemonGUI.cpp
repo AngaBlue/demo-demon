@@ -2,6 +2,10 @@
 #include "DemoDemon.h"
 #include "bakkesmod/wrappers/GuiManagerWrapper.h"
 
+#define FONT_SIZE 32
+#define FONT_NAME "Bourgeois"
+#define FONT_FILE "Bourgeois-BoldItalic.ttf"
+
 // Plugin Settings Window code here
 std::string DemoDemon::GetPluginName() {
 	return menuTitle;
@@ -27,12 +31,13 @@ void DemoDemon::RenderSettings() {
 // Do ImGui rendering here
 void DemoDemon::Render()
 {
-	// Check in game
+	// Check if in game
 	if (!(gameWrapper->IsInGame() || gameWrapper->IsInOnlineGame()) || gameWrapper->IsInFreeplay()) return;
 
+	// Load font
 	if (!largeFont) {
 		auto gui = gameWrapper->GetGUIManager();
-		largeFont = gui.GetFont("largefont");
+		largeFont = gui.GetFont(FONT_NAME);
 	}
 
 	const ImGuiWindowFlags flags = ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoBackground;
@@ -43,12 +48,12 @@ void DemoDemon::Render()
 	}
 
 	// Style
-	ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, { 8, 8 });
 	ImGuiStyle* style = &ImGui::GetStyle();
 	style->WindowMinSize = { 200, 140 };
 
 	// Content
 	auto kd = this->GetKD();
+	// Calculate KD RGB
 	float r, g, b = 0;
 	if (kd <= 1) {
 		r = 1;
@@ -114,7 +119,7 @@ void DemoDemon::SetImGuiContext(uintptr_t ctx)
 	ImGui::SetCurrentContext(reinterpret_cast<ImGuiContext*>(ctx));
 
 	auto gui = gameWrapper->GetGUIManager();
-	auto [res, font] = gui.LoadFont("largefont", "Bourgeois-BoldItalic.ttf", 12);
+	auto [res, font] = gui.LoadFont(FONT_FILE, FONT_FILE, FONT_SIZE);
 
 	if (res == 0) {
 		cvarManager->log("Failed to load the font!");

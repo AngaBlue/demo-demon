@@ -85,8 +85,6 @@ void DemoDemon::onStatTickerMessage(void* params)
 			this->kills++;
 			this->SetKD();
 		}
-
-		// gameWrapper->LogToChatbox(victim.GetPlayerName().ToString() + " was demoed by " + receiver.GetPlayerName().ToString());
 	}
 }
 
