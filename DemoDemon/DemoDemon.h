@@ -5,6 +5,7 @@
 #include "bakkesmod/plugin/PluginSettingsWindow.h"
 
 #include "version.h"
+#include "KD.h"
 constexpr auto plugin_version = stringify(VERSION_MAJOR) "." stringify(VERSION_MINOR) "." stringify(VERSION_PATCH) "." stringify(VERSION_BUILD);
 
 struct StatTickerParams {
@@ -15,19 +16,14 @@ struct StatTickerParams {
 
 class DemoDemon: public BakkesMod::Plugin::BakkesModPlugin, public BakkesMod::Plugin::PluginSettingsWindow, public BakkesMod::Plugin::PluginWindow
 {
-
-	//std::shared_ptr<bool> enabled;
-
 	//Boilerplate
 	virtual void onLoad();
 	virtual void onUnload();
 
-	// Inherited via PluginSettingsWindow
 	void RenderSettings() override;
 	std::string GetPluginName() override;
 	void SetImGuiContext(uintptr_t ctx) override;
 
-	// Inherited via PluginWindow
 	bool isWindowOpen_ = true;
 	bool isMinimized_ = false;
 	std::string menuTitle = "Demo Demon";
@@ -39,22 +35,28 @@ class DemoDemon: public BakkesMod::Plugin::BakkesModPlugin, public BakkesMod::Pl
 	virtual bool ShouldBlockInput() override;
 	virtual bool IsActiveOverlay() override;
 	virtual void OnOpen() override;
-	void RightAlignTextInColumn(std::string text);
 	virtual void OnClose() override;
 
+	/*
+	 * Demo Demon
+	 */
 
-	// Demo Demon
-private:
+	// Logic
+	KD game;
+	KD session;
+	unsigned int total = 0;
+
+	void StartGame();
+	void onStatTickerMessage(void* params);
+	bool GetBoolCvar(const std::string name, const bool fallback = false);
+
+	// Render
 	ImFont* largeFont;
 
-	double kd = 0;
-	unsigned int kills, deaths;
-
-	void onStatTickerMessage(void* params);
-	void SetKD();
-	double GetKD();
 	void StartRender();
 	void StopRender();
-	void StartGame();
+
+	void RightAlignTextInColumn(const std::string text);
+	void CreateToggleableCheckbox(const std::string name, const char* const display);
 };
 

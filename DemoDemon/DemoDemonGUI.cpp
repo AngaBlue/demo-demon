@@ -6,31 +6,35 @@
 #define FONT_NAME "Bourgeois"
 #define FONT_FILE "Bourgeois-BoldItalic.ttf"
 
-// Plugin Settings Window code here
 std::string DemoDemon::GetPluginName() {
 	return menuTitle;
 }
 
 void DemoDemon::RenderSettings() {
-	ImGui::TextUnformatted("Demo Demon Plugin Settings");
-	ImGui::TextColored({ 0.0f, 1.0f, 0.0f, 1.0f }, "KD: %.2f", this->GetKD());
-	CVarWrapper overlayCvar = cvarManager->getCvar("demo_overlay");
+	// Settings
+	CreateToggleableCheckbox("demodemon_enabled", "Enable overlay");
+	CreateToggleableCheckbox("demodemon_display_game", "Display game stats");
+	CreateToggleableCheckbox("demodemon_display_session", "Display session stats");
+	CreateToggleableCheckbox("demodemon_display_alltime", "Display all time stats");
 
-	if (!overlayCvar) {
-		return;
-	}
+	// Note
+	ImGui::Separator();
+	ImGui::TextUnformatted("Note:\nReposition the overlay by dragging whilst the Bakkesmod menu is open.");
 
-	bool overlay = overlayCvar.getBoolValue();
-
-	if (ImGui::Checkbox("Enable overlay", &overlay)) {
-		overlayCvar.setValue(overlay);
-	}
+	// Credit
+	ImGui::Separator();
+	ImGui::TextUnformatted("Demo Demon by ");
+	ImGui::SameLine(0, 0);
+	ImGui::TextColored({ 0, 1, 1, 1 }, "AngaBlue");
+	ImGui::TextUnformatted("https://anga.blue");
 }
-
 
 // Do ImGui rendering here
 void DemoDemon::Render()
 {
+	// Check enabled
+	if (!GetBoolCvar("demodemon_enabled")) return;
+
 	// Check if in game
 	if (!(gameWrapper->IsInGame() || gameWrapper->IsInOnlineGame()) || gameWrapper->IsInFreeplay()) return;
 
@@ -52,23 +56,6 @@ void DemoDemon::Render()
 	style->WindowMinSize = { 200, 140 };
 
 	// Content
-	auto kd = this->GetKD();
-	// Calculate KD RGB
-	float r, g, b = 0;
-	if (kd <= 1) {
-		r = 1;
-		g = kd;
-	}
-	else if (kd <= 2)
-	{
-		r = (2 - kd);
-		g = 1;
-	}
-	else {
-		r = 0;
-		g = 1;
-	}
-
 	if (largeFont) {
 		ImGui::PushFont(largeFont);
 	}
@@ -79,16 +66,20 @@ void DemoDemon::Render()
 	ImGui::Text("KD");
 	ImGui::Text("KILLS");
 	ImGui::Text("DEATHS");
+	ImGui::Text("TOTAL");
 
 	ImGui::NextColumn();
 	ImGui::SetColumnWidth(1, 80);
-	std::string text = fmt::format("{:.2f}", kd);
+	std::string text = fmt::format("{:.2f}", game.getKD());
 	RightAlignTextInColumn(text);
-	ImGui::TextColored({ r, g, b, 1.0f }, text.c_str());
-	text = fmt::format("{:d}", kills);
+	ImGui::TextColored(game.getKDColor(), text.c_str());
+	text = fmt::format("{:d}", game.getKills());
 	RightAlignTextInColumn(text);
 	ImGui::Text(text.c_str());
-	text = fmt::format("{:d}", deaths);
+	text = fmt::format("{:d}", game.getDeaths());
+	RightAlignTextInColumn(text);
+	ImGui::Text(text.c_str());
+	text = fmt::format("{:d}", total);
 	RightAlignTextInColumn(text);
 	ImGui::Text(text.c_str());
 
@@ -101,19 +92,16 @@ void DemoDemon::Render()
 	ImGui::End();
 }
 
-// Title to give the menu
 std::string DemoDemon::GetMenuTitle()
 {
 	return menuTitle;
 }
 
-// Title to give the menu
 std::string DemoDemon::GetMenuName()
 {
 	return menuName;
 }
 
-// Don't call this yourself, BM will call this function with a pointer to the current ImGui context
 void DemoDemon::SetImGuiContext(uintptr_t ctx)
 {
 	ImGui::SetCurrentContext(reinterpret_cast<ImGuiContext*>(ctx));
@@ -132,31 +120,27 @@ void DemoDemon::SetImGuiContext(uintptr_t ctx)
 	}
 }
 
-// Should events such as mouse clicks/key inputs be blocked so they won't reach the game
 bool DemoDemon::ShouldBlockInput()
 {
 	return ImGui::GetIO().WantCaptureMouse || ImGui::GetIO().WantCaptureKeyboard;
 }
 
-// Return true if window should be interactive
 bool DemoDemon::IsActiveOverlay()
 {
 	return false;
 }
 
-// Called when window is opened
 void DemoDemon::OnOpen()
 {
 	isWindowOpen_ = true;
 }
 
-void DemoDemon::RightAlignTextInColumn(std::string text)
+void DemoDemon::RightAlignTextInColumn(const std::string text)
 {
 	ImGui::SetCursorPosX(ImGui::GetCursorPosX() + ImGui::GetColumnWidth() - ImGui::CalcTextSize(text.c_str()).x
 		- ImGui::GetScrollX() - 2 * ImGui::GetStyle().ItemSpacing.x);
 }
 
-// Called when window is closed
 void DemoDemon::OnClose()
 {
 	isWindowOpen_ = false;
@@ -170,4 +154,16 @@ void DemoDemon::StartRender()
 void DemoDemon::StopRender()
 {
 	cvarManager->executeCommand("closemenu " + GetMenuName());
+}
+
+void DemoDemon::CreateToggleableCheckbox(const std::string name, const char* const display)
+{
+	CVarWrapper cvar = cvarManager->getCvar(name);
+	if (!cvar) return;
+
+	bool state = cvar.getBoolValue();
+
+	if (ImGui::Checkbox(display, &state)) {
+		cvar.setValue(state);
+	}
 }
