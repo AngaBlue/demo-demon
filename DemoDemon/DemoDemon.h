@@ -49,9 +49,10 @@ class DemoDemon: public BakkesMod::Plugin::BakkesModPlugin, public BakkesMod::Pl
 	void StartGame();
 	void onStatTickerMessage(void* params);
 	bool GetBoolCvar(const std::string name, const bool fallback = false);
+	float GetFloatCvar(const std::string name, const float fallback = 1);
 
 	// Render
-	ImFont* largeFont;
+	ImFont* font;
 
 	void StartRender();
 	void StopRender();

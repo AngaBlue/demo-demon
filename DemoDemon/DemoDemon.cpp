@@ -1,6 +1,10 @@
 #include "pch.h"
 #include "DemoDemon.h"
+#include "bakkesmod/wrappers/GuiManagerWrapper.h"
 
+#define FONT_SIZE 32
+#define FONT_NAME "Bourgeois"
+#define FONT_FILE "Bourgeois-BoldItalic.ttf"
 
 BAKKESMOD_PLUGIN(DemoDemon, "Demo Demon", plugin_version, PLUGINTYPE_BOTAI)
 
@@ -15,6 +19,7 @@ void DemoDemon::onLoad()
 	cvarManager->registerCvar("demodemon_display_game", "1");
 	cvarManager->registerCvar("demodemon_display_session", "1");
 	cvarManager->registerCvar("demodemon_display_total", "1");
+	cvarManager->registerCvar("demodemon_background_opacity", "0.5");
 
 	// Stat ticket event fired on demo
 	gameWrapper->HookEventWithCaller<ServerWrapper>("Function TAGame.GFxHUD_TA.HandleStatTickerMessage",
@@ -27,13 +32,27 @@ void DemoDemon::onLoad()
 	gameWrapper->HookEvent("Function Engine.PlayerInput.InitInputSystem", std::bind(&DemoDemon::StartGame, this));
 
 	// Initialize total demos
-	auto stats = CareerStatsWrapper().GetStatValues();
+	std::vector<CareerStatsWrapper::StatValue> stats = CareerStatsWrapper().GetStatValues();
 	for (size_t i = 0; i < stats.size(); i++)
 	{
-		auto stat = stats[i];
+		CareerStatsWrapper::StatValue stat = stats[i];
 		if (stat.stat_name == "Demolish") {
 			total = stat.ranked + stat.unranked + stat.private_;
 		}
+	}
+
+	// Load font
+	auto gui = gameWrapper->GetGUIManager();
+	auto [res, font] = gui.LoadFont(FONT_FILE, FONT_FILE, FONT_SIZE);
+
+	if (res == 0) {
+		cvarManager->log("Failed to load the font!");
+	}
+	else if (res == 1) {
+		cvarManager->log("The font will be loaded");
+	}
+	else if (res == 2 && font) {
+		this->font = font;
 	}
 
 	// Start rendering overlay
@@ -93,5 +112,12 @@ bool DemoDemon::GetBoolCvar(const std::string name, const bool fallback)
 {
 	CVarWrapper cvar = cvarManager->getCvar(name);
 	if (cvar) return cvar.getBoolValue();
+	else return fallback;
+}
+
+float DemoDemon::GetFloatCvar(const std::string name, const float fallback)
+{
+	CVarWrapper cvar = cvarManager->getCvar(name);
+	if (cvar) return cvar.getFloatValue();
 	else return fallback;
 }

@@ -1,6 +1,5 @@
 #include "pch.h"
 #include "DemoDemon.h"
-#include "bakkesmod/wrappers/GuiManagerWrapper.h"
 
 #define FONT_SIZE 32
 #define FONT_NAME "Bourgeois"
@@ -17,6 +16,16 @@ void DemoDemon::RenderSettings() {
 	CreateToggleableCheckbox("demodemon_display_session", "Display session stats");
 	CreateToggleableCheckbox("demodemon_display_total", "Display total demos");
 
+	CVarWrapper cvar = cvarManager->getCvar("demodemon_background_opacity");
+	if (!cvar) return;
+
+	float opacity = cvar.getFloatValue();
+
+	ImGui::TextUnformatted("Background opacity:");
+	if (ImGui::SliderFloat("", &opacity, 0, 1, "%.2f")) {
+		cvar.setValue(opacity);
+	}
+
 	// Note
 	ImGui::Separator();
 	ImGui::TextUnformatted("Note:\nReposition the overlay by dragging it whilst the Bakkesmod menu is open.");
@@ -29,7 +38,6 @@ void DemoDemon::RenderSettings() {
 	ImGui::TextUnformatted("https://anga.blue");
 }
 
-// Do ImGui rendering here
 void DemoDemon::Render()
 {
 	// Check enabled
@@ -38,13 +46,14 @@ void DemoDemon::Render()
 	// Check if in game
 	if (!(gameWrapper->IsInGame() || gameWrapper->IsInOnlineGame()) || gameWrapper->IsInFreeplay()) return;
 
-	// Load font
-	if (!largeFont) {
-		auto gui = gameWrapper->GetGUIManager();
-		largeFont = gui.GetFont(FONT_NAME);
-	}
+	// Style
+	float opacity = GetFloatCvar("demodemon_background_opacity", 0.5);
+	ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0);
+	ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 8);
+	ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, 0);
+	ImGui::PushStyleColor(ImGuiCol_WindowBg, { 0, 0, 0, opacity });
 
-	const ImGuiWindowFlags flags = ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoBackground;
+	const ImGuiWindowFlags flags = ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoScrollbar ;
 	if (!ImGui::Begin(menuTitle.c_str(), &isWindowOpen_, flags))
 	{
 		ImGui::End();
@@ -52,20 +61,24 @@ void DemoDemon::Render()
 	}
 
 	// Font
-	if (largeFont) ImGui::PushFont(largeFont);
+	if (font) ImGui::PushFont(font);
 
 	// Settings
 	bool displayGame = GetBoolCvar("demodemon_display_game");
 	bool displaySession = GetBoolCvar("demodemon_display_session");
 	bool displayTotal = GetBoolCvar("demodemon_display_total");
 
+	// Size
+	float height = 16 + (FONT_SIZE + 4) * (displayGame + displaySession + displayTotal);
+	ImGui::SetWindowSize({ 340, height });
+
 	// Content
 	ImGui::Columns(3, 0, false);
 
 	ImGui::SetColumnWidth(0, 160);
-	if (displayGame) ImGui::Text("Game KD");
-	if (displaySession) ImGui::Text("Session KD");
-	if (displayTotal) ImGui::Text("Total");
+	if (displayGame) ImGui::Text("GAME KD");
+	if (displaySession) ImGui::Text("SESSION KD");
+	if (displayTotal) ImGui::Text("TOTAL");
 
 	ImGui::NextColumn();
 	ImGui::SetColumnWidth(1, 80);
@@ -103,9 +116,13 @@ void DemoDemon::Render()
 	ImGui::Columns();
 
 	// Remove font
-	if (largeFont) ImGui::PopFont();
+	if (font) ImGui::PopFont();
 
 	ImGui::End();
+
+	// Remove style vars
+	ImGui::PopStyleVar(2);
+	ImGui::PopStyleColor();
 }
 
 std::string DemoDemon::GetMenuTitle()
@@ -121,19 +138,6 @@ std::string DemoDemon::GetMenuName()
 void DemoDemon::SetImGuiContext(uintptr_t ctx)
 {
 	ImGui::SetCurrentContext(reinterpret_cast<ImGuiContext*>(ctx));
-
-	auto gui = gameWrapper->GetGUIManager();
-	auto [res, font] = gui.LoadFont(FONT_FILE, FONT_FILE, FONT_SIZE);
-
-	if (res == 0) {
-		cvarManager->log("Failed to load the font!");
-	}
-	else if (res == 1) {
-		cvarManager->log("The font will be loaded");
-	}
-	else if (res == 2 && font) {
-		largeFont = font;
-	}
 }
 
 bool DemoDemon::ShouldBlockInput()
