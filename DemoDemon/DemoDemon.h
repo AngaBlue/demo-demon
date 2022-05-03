@@ -6,6 +6,11 @@
 
 #include "version.h"
 #include "KD.h"
+
+#define FONT_SIZE  32
+#define FONT_NAME "Bourgeois"
+#define FONT_FILE "Bourgeois-BoldItalic.ttf"
+
 constexpr auto plugin_version = stringify(VERSION_MAJOR) "." stringify(VERSION_MINOR) "." stringify(VERSION_PATCH) "." stringify(VERSION_BUILD);
 
 struct StatTickerParams {

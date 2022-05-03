@@ -2,10 +2,6 @@
 #include "DemoDemon.h"
 #include "bakkesmod/wrappers/GuiManagerWrapper.h"
 
-#define FONT_SIZE 32
-#define FONT_NAME "Bourgeois"
-#define FONT_FILE "Bourgeois-BoldItalic.ttf"
-
 BAKKESMOD_PLUGIN(DemoDemon, "Demo Demon", plugin_version, PLUGINTYPE_BOTAI)
 
 std::shared_ptr<CVarManagerWrapper> _globalCvarManager;
@@ -20,6 +16,7 @@ void DemoDemon::onLoad()
 	cvarManager->registerCvar("demodemon_display_session", "1");
 	cvarManager->registerCvar("demodemon_display_total", "1");
 	cvarManager->registerCvar("demodemon_background_opacity", "0.5");
+	cvarManager->registerCvar("demodemon_force_display", "0");
 
 	// Stat ticket event fired on demo
 	gameWrapper->HookEventWithCaller<ServerWrapper>("Function TAGame.GFxHUD_TA.HandleStatTickerMessage",
@@ -43,7 +40,7 @@ void DemoDemon::onLoad()
 
 	// Load font
 	auto gui = gameWrapper->GetGUIManager();
-	auto [res, font] = gui.LoadFont(FONT_FILE, FONT_FILE, FONT_SIZE);
+	auto [res, font] = gui.LoadFont(FONT_NAME, FONT_FILE, FONT_SIZE);
 
 	if (res == 0) {
 		cvarManager->log("Failed to load the font!");
@@ -54,6 +51,7 @@ void DemoDemon::onLoad()
 	else if (res == 2 && font) {
 		this->font = font;
 	}
+
 
 	// Start rendering overlay
 	gameWrapper->SetTimeout(std::bind(&DemoDemon::StartGame, this), 0.1f);

@@ -1,10 +1,6 @@
 #include "pch.h"
 #include "DemoDemon.h"
 
-#define FONT_SIZE 32
-#define FONT_NAME "Bourgeois"
-#define FONT_FILE "Bourgeois-BoldItalic.ttf"
-
 std::string DemoDemon::GetPluginName() {
 	return menuTitle;
 }
@@ -26,6 +22,8 @@ void DemoDemon::RenderSettings() {
 		cvar.setValue(opacity);
 	}
 
+	CreateToggleableCheckbox("demodemon_force_display", "Force display overlay");
+
 	// Note
 	ImGui::Separator();
 	ImGui::TextUnformatted("Note:\nReposition the overlay by dragging it whilst the Bakkesmod menu is open.");
@@ -44,7 +42,14 @@ void DemoDemon::Render()
 	if (!GetBoolCvar("demodemon_enabled")) return;
 
 	// Check if in game
-	if (!(gameWrapper->IsInGame() || gameWrapper->IsInOnlineGame()) || gameWrapper->IsInFreeplay()) return;
+	if (!GetBoolCvar("demodemon_force_display") && !(gameWrapper->IsInGame() || gameWrapper->IsInOnlineGame()) || gameWrapper->IsInFreeplay()) return;
+
+	// Settings
+	bool displayGame = GetBoolCvar("demodemon_display_game");
+	bool displaySession = GetBoolCvar("demodemon_display_session");
+	bool displayTotal = GetBoolCvar("demodemon_display_total");
+
+	if (!displayGame && !displaySession && !displayTotal) return;
 
 	// Style
 	float opacity = GetFloatCvar("demodemon_background_opacity", 0.5);
@@ -53,6 +58,9 @@ void DemoDemon::Render()
 	ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, 0);
 	ImGui::PushStyleColor(ImGuiCol_WindowBg, { 0, 0, 0, opacity });
 
+	// Font
+	if (font) ImGui::PushFont(font);
+
 	const ImGuiWindowFlags flags = ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoScrollbar ;
 	if (!ImGui::Begin(menuTitle.c_str(), &isWindowOpen_, flags))
 	{
@@ -60,17 +68,10 @@ void DemoDemon::Render()
 		return;
 	}
 
-	// Font
-	if (font) ImGui::PushFont(font);
-
-	// Settings
-	bool displayGame = GetBoolCvar("demodemon_display_game");
-	bool displaySession = GetBoolCvar("demodemon_display_session");
-	bool displayTotal = GetBoolCvar("demodemon_display_total");
-
-	// Size
+	// Size & Position
 	float height = 16 + (FONT_SIZE + 4) * (displayGame + displaySession + displayTotal);
 	ImGui::SetWindowSize({ 340, height });
+	ImGui::SetWindowPos({ ImGui::GetIO().DisplaySize.x - ImGui::GetWindowSize().x - 10, 10}, ImGuiCond_FirstUseEver);
 
 	// Content
 	ImGui::Columns(3, 0, false);
@@ -115,10 +116,10 @@ void DemoDemon::Render()
 	// End columns
 	ImGui::Columns();
 
+	ImGui::End();
+
 	// Remove font
 	if (font) ImGui::PopFont();
-
-	ImGui::End();
 
 	// Remove style vars
 	ImGui::PopStyleVar(2);
