@@ -14,7 +14,7 @@ void DemoDemon::onLoad()
 	cvarManager->registerCvar("demodemon_enabled", "1");
 	cvarManager->registerCvar("demodemon_display_game", "1");
 	cvarManager->registerCvar("demodemon_display_session", "1");
-	cvarManager->registerCvar("demodemon_display_alltime", "1");
+	cvarManager->registerCvar("demodemon_display_total", "1");
 
 	// Stat ticket event fired on demo
 	gameWrapper->HookEventWithCaller<ServerWrapper>("Function TAGame.GFxHUD_TA.HandleStatTickerMessage",

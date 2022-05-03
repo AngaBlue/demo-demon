@@ -15,11 +15,11 @@ void DemoDemon::RenderSettings() {
 	CreateToggleableCheckbox("demodemon_enabled", "Enable overlay");
 	CreateToggleableCheckbox("demodemon_display_game", "Display game stats");
 	CreateToggleableCheckbox("demodemon_display_session", "Display session stats");
-	CreateToggleableCheckbox("demodemon_display_alltime", "Display all time stats");
+	CreateToggleableCheckbox("demodemon_display_total", "Display total demos");
 
 	// Note
 	ImGui::Separator();
-	ImGui::TextUnformatted("Note:\nReposition the overlay by dragging whilst the Bakkesmod menu is open.");
+	ImGui::TextUnformatted("Note:\nReposition the overlay by dragging it whilst the Bakkesmod menu is open.");
 
 	// Credit
 	ImGui::Separator();
@@ -51,44 +51,60 @@ void DemoDemon::Render()
 		return;
 	}
 
-	// Style
-	ImGuiStyle* style = &ImGui::GetStyle();
-	style->WindowMinSize = { 200, 140 };
+	// Font
+	if (largeFont) ImGui::PushFont(largeFont);
+
+	// Settings
+	bool displayGame = GetBoolCvar("demodemon_display_game");
+	bool displaySession = GetBoolCvar("demodemon_display_session");
+	bool displayTotal = GetBoolCvar("demodemon_display_total");
 
 	// Content
-	if (largeFont) {
-		ImGui::PushFont(largeFont);
-	}
+	ImGui::Columns(3, 0, false);
 
-	ImGui::Columns(2, 0, false);
-
-	ImGui::SetColumnWidth(0, 120);
-	ImGui::Text("KD");
-	ImGui::Text("KILLS");
-	ImGui::Text("DEATHS");
-	ImGui::Text("TOTAL");
+	ImGui::SetColumnWidth(0, 160);
+	if (displayGame) ImGui::Text("Game KD");
+	if (displaySession) ImGui::Text("Session KD");
+	if (displayTotal) ImGui::Text("Total");
 
 	ImGui::NextColumn();
 	ImGui::SetColumnWidth(1, 80);
-	std::string text = fmt::format("{:.2f}", game.getKD());
-	RightAlignTextInColumn(text);
-	ImGui::TextColored(game.getKDColor(), text.c_str());
-	text = fmt::format("{:d}", game.getKills());
-	RightAlignTextInColumn(text);
-	ImGui::Text(text.c_str());
-	text = fmt::format("{:d}", game.getDeaths());
-	RightAlignTextInColumn(text);
-	ImGui::Text(text.c_str());
-	text = fmt::format("{:d}", total);
-	RightAlignTextInColumn(text);
-	ImGui::Text(text.c_str());
+	if (displayGame) {
+		std::string text = fmt::format("{:.2f}", game.getKD());
+		RightAlignTextInColumn(text);
+		ImGui::TextColored(game.getKDColor(), text.c_str());
+	}
+	if (displaySession) {
+		std::string text = fmt::format("{:.2f}", session.getKD());
+		RightAlignTextInColumn(text);
+		ImGui::TextColored(session.getKDColor(), text.c_str());
+	}
 
+	ImGui::NextColumn();
+	ImGui::SetColumnWidth(2, 100);
+
+	if (displayGame) {
+		std::string text = fmt::format("{:d}:{:d}", game.getKills(), game.getDeaths());
+		RightAlignTextInColumn(text);
+		ImGui::Text(text.c_str());
+	}
+	if (displaySession) {
+		std::string text = fmt::format("{:d}:{:d}", session.getKills(), session.getDeaths());
+		RightAlignTextInColumn(text);
+		ImGui::Text(text.c_str());
+	}
+	if (displayTotal) {
+		std::string text = fmt::format("{:d}", total);
+		RightAlignTextInColumn(text);
+		ImGui::Text(text.c_str());
+	}
+
+	// End columns
 	ImGui::Columns();
 
-	if (largeFont) {
-		ImGui::PopFont();
-	}
-	// ImGui renreding ends here
+	// Remove font
+	if (largeFont) ImGui::PopFont();
+
 	ImGui::End();
 }
 
