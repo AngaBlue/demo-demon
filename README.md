@@ -3,8 +3,11 @@
   <a href="https://github.com/AngaBlue/demo-demon/blob/master/LICENSE" target="_blank">
     <img alt="License: LGPL--3.0--or--later" src="https://img.shields.io/github/license/AngaBlue/demo-demon?color=green&label=License" />
   </a>
-
 </p>
+<p>
+    <img src="https://bp-prod.nyc3.digitaloceanspaces.com/uploads/36086_56d81eca555227b3662fae14bb2aa8ba3dca3f74d9a843b7bf59dc414fd4c689.jpeg">
+<p>
+
 
 A customizable in-game overlay for tracking demos and KD.
 
@@ -18,7 +21,7 @@ A customizable in-game overlay for tracking demos and KD.
 
 ## Install & Usage
 
-Install the plugin for [Bakkesmod](https://bakkesmod.com/) from [BakkesmodPlugins](https://bakkesplugins.com/).
+Install the plugin for [Bakkesmod](https://bakkesmod.com/) from [BakkesmodPlugins](https://bakkesplugins.com/plugins/view/331).
 
 ## Author
 
