@@ -1,5 +1,6 @@
 #include "pch.h"
 #include "DemoDemon.h"
+#include "bakkesmod/wrappers/GuiManagerWrapper.h"
 
 std::string DemoDemon::GetPluginName() {
 	return menuTitle;
@@ -59,6 +60,10 @@ void DemoDemon::Render()
 	ImGui::PushStyleColor(ImGuiCol_WindowBg, { 0, 0, 0, opacity });
 
 	// Font
+	if (!font) {
+		auto gui = gameWrapper->GetGUIManager();
+		font = gui.GetFont(FONT_NAME);
+	}
 	if (font) ImGui::PushFont(font);
 
 	const ImGuiWindowFlags flags = ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoScrollbar ;

@@ -15,7 +15,7 @@ void DemoDemon::onLoad()
 	cvarManager->registerCvar("demodemon_display_game", "1");
 	cvarManager->registerCvar("demodemon_display_session", "1");
 	cvarManager->registerCvar("demodemon_display_total", "1");
-	cvarManager->registerCvar("demodemon_background_opacity", "0.5");
+	cvarManager->registerCvar("demodemon_background_opacity", "0.6");
 	cvarManager->registerCvar("demodemon_force_display", "0");
 
 	// Stat ticket event fired on demo
