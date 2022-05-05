@@ -62,7 +62,8 @@ void DemoDemon::Render()
 	// Font
 	if (!font) {
 		auto gui = gameWrapper->GetGUIManager();
-		font = gui.GetFont(FONT_NAME);
+		ImFont * retrievedFont = gui.GetFont(FONT_NAME);
+		if (retrievedFont) font = retrievedFont;
 	}
 	if (font) ImGui::PushFont(font);
 
