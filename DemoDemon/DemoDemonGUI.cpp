@@ -13,6 +13,7 @@ void DemoDemon::RenderSettings() {
 	CreateToggleableCheckbox("demodemon_display_session", "Display session stats");
 	CreateToggleableCheckbox("demodemon_display_total", "Display total demos");
 
+	// Opacity Slider
 	CVarWrapper cvar = cvarManager->getCvar("demodemon_background_opacity");
 	if (!cvar) return;
 
@@ -23,6 +24,7 @@ void DemoDemon::RenderSettings() {
 		cvar.setValue(opacity);
 	}
 
+	// Force display
 	CreateToggleableCheckbox("demodemon_force_display", "Force display overlay");
 
 	// Note
@@ -56,7 +58,6 @@ void DemoDemon::Render()
 	float opacity = GetFloatCvar("demodemon_background_opacity", 0.5);
 	ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0);
 	ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 8);
-	ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, 0);
 	ImGui::PushStyleColor(ImGuiCol_WindowBg, { 0, 0, 0, opacity });
 
 	// Font
@@ -75,7 +76,7 @@ void DemoDemon::Render()
 	}
 
 	// Size & Position
-	float height = 16 + (FONT_SIZE + 4) * (displayGame + displaySession + displayTotal);
+	float height = 16.0f + (FONT_SIZE + 4) * (displayGame + displaySession + displayTotal);
 	ImGui::SetWindowSize({ 340, height });
 	ImGui::SetWindowPos({ ImGui::GetIO().DisplaySize.x - ImGui::GetWindowSize().x - 10, 10}, ImGuiCond_FirstUseEver);
 

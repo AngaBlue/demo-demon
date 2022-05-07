@@ -3,7 +3,7 @@
 
 void KD::updateKD()
 {
-	// Set deaths = 1 if 0 to avoide DIV/0 error
+	// Set deaths = 1 if 0 to avoid DIV/0 error
 	unsigned int deaths = this->deaths;
 	if (!deaths) deaths = 1;
 
