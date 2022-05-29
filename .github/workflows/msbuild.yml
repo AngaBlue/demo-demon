@@ -44,18 +44,9 @@ jobs:
       # See https://docs.microsoft.com/visualstudio/msbuild/msbuild-command-line-reference
       run: msbuild /m /p:Configuration=${{env.BUILD_CONFIGURATION}} /p:BakkesModPath=D:\a\demo-demon\demo-demon /p:Environment=GitHub ${{env.SOLUTION_FILE_PATH}}
 
-    - name: Publish
-      uses: actions/upload-artifact@v3
-      with:
-        name: DemoDemon.dll
-        path: D:\a\demo-demon\demo-demon\plugins\DemoDemon.dll
-
     - name: Create Release
-      uses: actions/create-release@v1
+      uses: softprops/action-gh-release@v1
+      with:
+        files: D:\a\demo-demon\demo-demon\plugins\DemoDemon.dll
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        tag_name: ${{ github.ref }}
-        release_name: Release ${{ github.ref }}
-        draft: false
-        prerelease: false
