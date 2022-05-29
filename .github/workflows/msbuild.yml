@@ -28,7 +28,7 @@ jobs:
     - name: Clone BakkesmodSDK
       uses: actions/checkout@v3
       with:
-        repository: https://github.com/bakkesmodorg/BakkesModSDK
+        repository: bakkesmodorg/BakkesModSDK
         path: $GITHUB_WORKSPACE/bakkesmod
 
     - name: Set BakkesmodSDK Environmental Variable
