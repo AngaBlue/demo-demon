@@ -31,9 +31,6 @@ jobs:
         repository: bakkesmodorg/BakkesModSDK
         path: $GITHUB_WORKSPACE/bakkesmod
 
-    - name: Set BakkesmodSDK Environmental Variable
-      run: SET https://github.com/bakkesmodorg/BakkesModSDK=$GITHUB_WORKSPACE/bakkesmod
-
     - name: Add MSBuild to PATH
       uses: microsoft/setup-msbuild@v1.0.2
 
@@ -45,4 +42,4 @@ jobs:
       working-directory: ${{env.GITHUB_WORKSPACE}}
       # Add additional options to the MSBuild command line here (like platform or verbosity level).
       # See https://docs.microsoft.com/visualstudio/msbuild/msbuild-command-line-reference
-      run: msbuild /m /p:Configuration=${{env.BUILD_CONFIGURATION}} ${{env.SOLUTION_FILE_PATH}}
+      run: msbuild /m /p:Configuration=${{env.BUILD_CONFIGURATION}};BakkesModPath=$GITHUB_WORKSPACE/bakkesmod ${{env.SOLUTION_FILE_PATH}}
