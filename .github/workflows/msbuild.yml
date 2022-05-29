@@ -48,4 +48,4 @@ jobs:
       with:
         files: D:\a\demo-demon\demo-demon\plugins\DemoDemon.dll
       env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        GITHUB_TOKEN: ${{ secrets.PAT }}
