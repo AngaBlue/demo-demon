@@ -2,7 +2,7 @@
 #include "DemoDemon.h"
 #include "bakkesmod/wrappers/GuiManagerWrapper.h"
 
-BAKKESMOD_PLUGIN(DemoDemon, "Demo Demon", plugin_version, PLUGINTYPE_BOTAI)
+BAKKESMOD_PLUGIN(DemoDemon, "Demo Demon", plugin_version, PLUGINTYPE_CUSTOM_TRAINING)
 
 std::shared_ptr<CVarManagerWrapper> _globalCvarManager;
 
@@ -15,28 +15,14 @@ void DemoDemon::onLoad()
 	cvarManager->registerCvar("demodemon_display_game", "1");
 	cvarManager->registerCvar("demodemon_display_session", "1");
 	cvarManager->registerCvar("demodemon_display_total", "1");
-	cvarManager->registerCvar("demodemon_background_opacity", "0.6");
-	cvarManager->registerCvar("demodemon_force_display", "0");
+	cvarManager->registerCvar("demodemon_background_opacity", "0.5");
 
-	// Stat ticket event fired on demo
-	gameWrapper->HookEventWithCaller<ServerWrapper>("Function TAGame.GFxHUD_TA.HandleStatTickerMessage",
-		[this](ServerWrapper caller, void* params, std::string eventname) {
-			DemoDemon::onStatTickerMessage(params);
-		});
-
-	// Start Game
+	// Hook events
+	gameWrapper->HookEventWithCaller<ServerWrapper>("Function TAGame.GFxHUD_TA.HandleStatTickerMessage", std::bind(&DemoDemon::onStatTickerMessage, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
 	gameWrapper->HookEvent("Function GameEvent_Soccar_TA.WaitingForPlayers.BeginState", std::bind(&DemoDemon::StartGame, this));
 	gameWrapper->HookEvent("Function Engine.PlayerInput.InitInputSystem", std::bind(&DemoDemon::StartGame, this));
 
-	// Initialize total demos
-	std::vector<CareerStatsWrapper::StatValue> stats = CareerStatsWrapper().GetStatValues();
-	for (size_t i = 0; i < stats.size(); i++)
-	{
-		CareerStatsWrapper::StatValue stat = stats[i];
-		if (stat.stat_name == "Demolish") {
-			total = stat.ranked + stat.unranked + stat.private_;
-		}
-	}
+	UpdateTotalDemos();
 
 	// Load font
 	auto gui = gameWrapper->GetGUIManager();
@@ -52,7 +38,6 @@ void DemoDemon::onLoad()
 		this->font = font;
 	}
 
-
 	// Start rendering overlay
 	gameWrapper->SetTimeout(std::bind(&DemoDemon::StartGame, this), 0.1f);
 }
@@ -64,7 +49,7 @@ void DemoDemon::onUnload()
 	gameWrapper->UnhookEvent("Function Engine.PlayerInput.InitInputSystem");
 }
 
-void DemoDemon::onStatTickerMessage(void* params)
+void DemoDemon::onStatTickerMessage(ServerWrapper caller, void* params, std::string eventname)
 {
 	StatTickerParams* pStruct = (StatTickerParams*)params;
 	PriWrapper receiver = PriWrapper(pStruct->Receiver);
@@ -72,8 +57,7 @@ void DemoDemon::onStatTickerMessage(void* params)
 	StatEventWrapper statEvent = StatEventWrapper(pStruct->StatEvent);
 
 	if (statEvent.GetEventName() != "Demolish") return;
-	if (!receiver) return;
-	if (!victim) return;
+	if (!receiver || !victim) return;
 
 	PlayerControllerWrapper playerController = gameWrapper->GetPlayerController();
 	if (!playerController) return;
@@ -99,7 +83,6 @@ void DemoDemon::onStatTickerMessage(void* params)
 	}
 }
 
-
 void DemoDemon::StartGame()
 {
 	game = KD();
@@ -118,4 +101,17 @@ float DemoDemon::GetFloatCvar(const std::string name, const float fallback)
 	CVarWrapper cvar = cvarManager->getCvar(name);
 	if (cvar) return cvar.getFloatValue();
 	else return fallback;
+}
+
+void DemoDemon::UpdateTotalDemos()
+{
+	std::vector<CareerStatsWrapper::StatValue> stats = CareerStatsWrapper().GetStatValues();
+	for (size_t i = 0; i < stats.size(); i++)
+	{
+		CareerStatsWrapper::StatValue stat = stats[i];
+		if (stat.stat_name == "Demolish") {
+			total = stat.ranked + stat.unranked + stat.private_;
+			return;
+		}
+	}
 }

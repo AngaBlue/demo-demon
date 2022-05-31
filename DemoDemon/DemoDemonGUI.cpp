@@ -24,9 +24,6 @@ void DemoDemon::RenderSettings() {
 		cvar.setValue(opacity);
 	}
 
-	// Force display
-	CreateToggleableCheckbox("demodemon_force_display", "Force display overlay");
-
 	// Note
 	ImGui::Separator();
 	ImGui::TextUnformatted("Note:\nReposition the overlay by dragging it whilst the Bakkesmod menu is open.");
@@ -43,9 +40,6 @@ void DemoDemon::Render()
 {
 	// Check enabled
 	if (!GetBoolCvar("demodemon_enabled")) return;
-
-	// Check if in game
-	if (!GetBoolCvar("demodemon_force_display") && !(gameWrapper->IsInGame() || gameWrapper->IsInOnlineGame()) || gameWrapper->IsInFreeplay()) return;
 
 	// Settings
 	bool displayGame = GetBoolCvar("demodemon_display_game");
@@ -78,7 +72,7 @@ void DemoDemon::Render()
 	// Size & Position
 	float height = 16.0f + (FONT_SIZE + 4) * (displayGame + displaySession + displayTotal);
 	ImGui::SetWindowSize({ 340, height });
-	ImGui::SetWindowPos({ ImGui::GetIO().DisplaySize.x - ImGui::GetWindowSize().x - 10, 10}, ImGuiCond_FirstUseEver);
+	ImGui::SetWindowPos({ ImGui::GetIO().DisplaySize.x - ImGui::GetWindowSize().x - 10, ImGui::GetWindowSize().x / 4 }, ImGuiCond_FirstUseEver);
 
 	// Content
 	ImGui::Columns(3, 0, false);

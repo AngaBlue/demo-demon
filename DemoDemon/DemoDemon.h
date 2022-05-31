@@ -3,11 +3,10 @@
 #include "bakkesmod/plugin/bakkesmodplugin.h"
 #include "bakkesmod/plugin/pluginwindow.h"
 #include "bakkesmod/plugin/PluginSettingsWindow.h"
-
 #include "version.h"
 #include "KD.h"
 
-#define FONT_SIZE  32
+#define FONT_SIZE 32
 #define FONT_NAME "Bourgeois"
 #define FONT_FILE "Bourgeois-BoldItalic.ttf"
 
@@ -52,9 +51,10 @@ class DemoDemon: public BakkesMod::Plugin::BakkesModPlugin, public BakkesMod::Pl
 	unsigned int total = 0;
 
 	void StartGame();
-	void onStatTickerMessage(void* params);
+	void onStatTickerMessage(ServerWrapper caller, void* params, std::string eventname);
 	bool GetBoolCvar(const std::string name, const bool fallback = false);
 	float GetFloatCvar(const std::string name, const float fallback = 1);
+	void UpdateTotalDemos();
 
 	// Render
 	ImFont* font;
