@@ -1,7 +1,7 @@
 <h1 align="center">Demo Demon Bakkesmod Plugin</h1>
 <p align="center">
   <a href="https://github.com/AngaBlue/demo-demon/blob/master/LICENSE" target="_blank">
-    <img alt="License: LGPL--3.0--or--later" src="https://img.shields.io/github/license/AngaBlue/demo-demon?color=green&label=License" />
+    <img alt="Licence: MIT" src="https://img.shields.io/github/license/AngaBlue/demo-demon?color=green&label=Licence" />
   </a>
 </p>
 <p>
@@ -37,4 +37,4 @@ Give a ⭐️ if this project helped you!
 ## 📝 License
 
 Copyright © 2021 [AngaBlue <contact@anga.blue>](https://github.com/AngaBlue).<br />
-This project is [LGPL--3.0--or--later](https://github.com/AngaBlue/demo-demon/blob/master/LICENSE) licensed.
+This project is [MIT](https://github.com/AngaBlue/demo-demon/blob/master/LICENSE) licensed.
