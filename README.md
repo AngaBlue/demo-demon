@@ -21,7 +21,7 @@ A customizable in-game overlay for tracking demos and KD.
 
 ## Install & Usage
 
-Install the plugin for [Bakkesmod](https://bakkesmod.com/) from [BakkesmodPlugins](https://bakkesplugins.com/plugins/view/331).
+Install the plugin for [Bakkesmod](https://bakkesmod.com/) from [BakkesmodPlugins](https://bakkesplugins.com/plugins/331).
 
 ## Author
 
